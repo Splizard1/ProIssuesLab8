@@ -45,6 +45,7 @@ public class Game extends Application {
 
     /**
      * JavaFX method that is called to start the JavaFX program.
+     *
      * @param stage The stage to display the GUI in.
      */
     @Override
@@ -60,13 +61,17 @@ public class Game extends Application {
         // Record the current system time
         startTime = System.currentTimeMillis();
 
-        if(playGameAutomatically) {
+        if (playGameAutomatically) {
             startGame();
         }
+    }
+    public ArrayList<Button> getButtons() {
+        return buttons;
     }
 
     /**
      * Create the scene graph for the game.
+     *
      * @return The scene graph's root node.
      */
     private Parent createSceneGraph() {
@@ -92,13 +97,14 @@ public class Game extends Application {
 
     /**
      * Create the grid of buttons.
+     *
      * @return The grid's root node.
      */
     private GridPane createGridOfButtons() {
         GridPane grid = new GridPane();
 
         // Allow each row in the grid to grow in the vertical direction as needed
-        for (int row = 0 ; row < GRID_SIZE ; row++){
+        for (int row = 0; row < GRID_SIZE; row++) {
             RowConstraints rc = new RowConstraints();
             rc.setFillHeight(true);
             rc.setVgrow(Priority.ALWAYS);
@@ -106,7 +112,7 @@ public class Game extends Application {
         }
 
         // Allow each row in the grid to grow in the horizontal direction as needed
-        for (int col = 0 ; col < GRID_SIZE; col++) {
+        for (int col = 0; col < GRID_SIZE; col++) {
             ColumnConstraints cc = new ColumnConstraints();
             cc.setFillWidth(true);
             cc.setHgrow(Priority.ALWAYS);
@@ -114,7 +120,7 @@ public class Game extends Application {
         }
 
         // Fill the grid with buttons
-        for (int i = 0 ; i < GRID_SIZE * GRID_SIZE ; i++) {
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
             Button button = createButton(i);
             grid.add(button, i % GRID_SIZE, i / GRID_SIZE);
             buttons.add(button);
@@ -125,6 +131,7 @@ public class Game extends Application {
 
     /**
      * Create a button
+     *
      * @param buttonNumber The number of the button to create.
      * @return The button.
      */
@@ -146,13 +153,14 @@ public class Game extends Application {
 
     /**
      * This is called automatically when a button is clicked.
+     *
      * @param button The button that was clicked.
      */
     public void onButtonClick(Button button) {
         long currentTime = System.currentTimeMillis();
         long timeButtonClickedSinceStart = currentTime - startTime;
 
-        if(timeButtonClickedSinceStart < GAME_DURATION){
+        if (timeButtonClickedSinceStart < GAME_DURATION) {
             // The button was clicked within the time limit
 
             // Each button's ID is "buttonX". We extract the X.
@@ -167,16 +175,19 @@ public class Game extends Application {
         } else {
             // Clicked outside of time limit
 
-            displayResult();
-            stopGame();
+            displayResult(); // Display result when time is up
+            stopGame(); // Stop the game
         }
     }
+
 
     /**
      * Start the game.
      */
-    public void startGame()
-    {
+    public void startGame() {
+        // Reset the score at the start of the game
+        result = 0;
+
         // Make a random square red
         int xRandom = rand.nextInt(GRID_SIZE);
         int yRandom = rand.nextInt(GRID_SIZE);
@@ -187,7 +198,7 @@ public class Game extends Application {
      * Reset all squares so that none of them are red.
      */
     public void resetSquares() {
-        for(Button b: buttons) {
+        for (Button b : buttons) {
             // Set the style to empty - so the button displays normally
             b.setStyle(null);
         }
@@ -199,13 +210,15 @@ public class Game extends Application {
     public void stopGame() {
         // Disable all squares and make sure they are not red
         resetSquares();
-        for(Button b: buttons) {
-            b.setDisable(true);
+        for (Button b : buttons) {
+            b.setDisable(true);  // Disable all buttons so no more clicks can happen
         }
     }
 
+
     /**
      * Turns a square red at a specified coordinate.
+     *
      * @param x The x coordinate of the square (counting from 0 at the left).
      * @param y The y coordinate of the square (counting from 0 at the top).
      */
@@ -232,6 +245,7 @@ public class Game extends Application {
 
     /**
      * Get the x coordinate of the last square clicked.
+     *
      * @return The x coordinate of the square (counting from 0 at the top).
      */
     public int getLastClickedSquareX() {
@@ -241,6 +255,7 @@ public class Game extends Application {
 
     /**
      * Get the y coordinate of the last square clicked.
+     *
      * @return The y coordinate of the square (counting from 0 at the top).
      */
     public int getLastClickedSquareY() {
@@ -250,6 +265,7 @@ public class Game extends Application {
 
     /**
      * Returns the x coordinate of the square that is red. Grid coordinates start from 0.
+     *
      * @return the x coordinate of the square that is red. Returns -1 if no square is red.
      */
     public int getDisplayedSquareX() {
@@ -258,6 +274,7 @@ public class Game extends Application {
 
     /**
      * Returns the y coordinate of the square that is red. Grid coordinates start from 0.
+     *
      * @return the y coordinate of the square that is red. Returns -1 if no square is red.
      */
     public int getDisplayedSquareY() {
@@ -268,16 +285,31 @@ public class Game extends Application {
      * Display if the user clicked the correct square.
      */
     private void displayClickStatus() {
-        // to be implemented in Lab 9
+        // Get the coordinates of the last clicked square
+        int clickedX = getLastClickedSquareX();
+        int clickedY = getLastClickedSquareY();
+
+        // Check if the clicked square matches the displayed square
+        if (clickedX == displaySquareX && clickedY == displaySquareY) {
+            // Correct click
+            result++; // Increment score
+            resultBox.setText("Correct! Current score: " + result);
+        } else {
+            // Wrong click
+            resultBox.setText("You lost! Final score: " + result);
+            stopGame(); // Stop the game immediately after a wrong click
+        }
     }
+
 
     /**
      * Display the win message.
      */
     private void displayResult() {
-        // To be modified in Lab 9
-        resultBox.setText("Time Up!");
+        // Display the result (score) when time is up
+        resultBox.setText("Time's up! Your final score is: " + result);
     }
+
 
     /**
      * Main method that starts the JavaFX application.
@@ -286,7 +318,6 @@ public class Game extends Application {
         playGameAutomatically = true;
         launch();
     }
-
 
 
 }

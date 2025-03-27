@@ -1,7 +1,6 @@
 package uk.ac.swansea.cs135.labs.lab8;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Labeled;
+
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import org.junit.Test;
